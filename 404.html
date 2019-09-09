@@ -10,6 +10,11 @@
 	  $scope.monthly_salary = 60000;
 	  $scope.home_loan = 'have';
 	  $scope.hra = 'own';
+	  $scope.data = {
+		home_emi: 26000,
+		house_tax: 15000,
+		rent: 27000,
+	  }
 	  $scope.annual_salary = function(){
 	    return $scope.monthly_salary * 12;
 	  };
@@ -43,24 +48,91 @@
 		  return 'Good';
 		}
 	  };
+	  $scope.getAnnualNetIncome = function(){
+		  var income = parseFloat($scope.annual_salary());
+		  var expense_monthly = parseFloat($scope.other_emi);
+		  var expense_yearly = parseFloat($scope.life_insurance) + parseFloat($scope.health_insurance);
+		  if(($scope.home_loan == 'have')){
+			  expense_monthly = expense_monthly + parseFloat($scope.data.home_emi);
+		  }
+		  if(($scope.hra == 'own')){
+			  expense_yearly = expense_yearly + parseFloat($scope.data.house_tax);
+		  }
+		  else{
+			  expense_monthly = expense_monthly + parseFloat($scope.data.rent);
+		  }
+		  var annualised_expense = expense_monthly * 12;
+		  return income - annualised_expense - expense_yearly;
+	  };
+	  $scope.getEmergencyFund = function(){
+		  var three_month_salary = $scope.monthly_salary * 3;
+		  return three_month_salary;
+	  };
+	  $scope.getEmergencyReadiness = function(){
+		  if(($scope.emergency == 0)){
+			  return 'For your family sake. Start saving for emergencies!!!';
+		  }
+		  if(($scope.getEmergencyFund() > $scope.emergency)){
+			  return 'But you have less';
+		  }
+		  else{
+		  	  return 'And you are ready for it. Great going.!';
+		  }
+	  };
 	}]);
 	</script>
 	<style>
+        #main {
+            height: 100%;
+	    width: 100%;
+	    position: relative;
+	}
 	#summary {
+	    height: 10%;
+	    width: 100%;
             border-style: solid;
-            border-color: coral;
-	    background-color: yellow;
+            border-color: grey;
+	    background-color: lightgrey;
             }
+	#content {
+            height: 80%;
+	    width: 100%;
+            border-style: solid;
+	    border-color: grey;
+	}
         </style>
   </head>
   <body>
-    <h1>Your Financial Planner</h1>
-    <div ng-controller="plancontrol">
-      <p>I earn <input type="text" ng-model="monthly_salary" ng-init="monthly_salary='60000'"> per month. I do <select ng-model="home_loan" ng-init="home_loan='have'"> <option selected="selected" value="have">have</option> <option value="do not have">do not have</option></select> a home loan. Further, I live in <select ng-model="hra"> <option selected="selected" value="own" ng-init="hra='own'"> my own house</option> <option value="rented" ng-int="hra='rented'"> a rental house</option></select> </p>
+    <p>Financial Planner</p>
+    <div id="main" ng-controller="plancontrol">
+	    <p>I earn <input type="number" ng-model="monthly_salary" ng-init="monthly_salary=60000"/> per month. I do <select ng-model="home_loan" ng-init="home_loan='have'"> <option selected="selected" value="have">have</option> <option value="do not have">do not have</option></select> a home loan. Further, I live in <select ng-model="hra"> <option selected="selected" value="own" ng-init="hra='own'"> my own house</option> <option value="rented" ng-int="hra='rented'"> a rental house</option></select> </p>
       <div id="summary">
-	  <h3>Wow! You earn {{annual_salary()}} per annum. That's {{salary_wish()}}!!</h3>
-	  <h3>And you {{home_loan}} home loan. That's {{home_loan_wish()}}!!</h3>
-	  <h3>Also you live in {{hra}} house. That's sounds {{hra_wish()}}!!</h3>
+	  <p>Wow! You earn {{annual_salary()}} per annum. That's {{salary_wish()}}!!</p>
+	  <p>And you {{home_loan}} home loan. That's {{home_loan_wish()}}!!</p>
+	  <p>Also you live in {{hra}} house. That's sounds {{hra_wish()}}!!</p>
+      </div>
+      <div id="content">
+	      <div id="addtional_details">
+		      Fill up addtional details
+		      <div>
+			      <p>Your monthly Loan EMI (Other than Home Loan): <input type="number" ng-model="other_emi" ng-init="other_emi=0"/></p>
+			      <p>Your yearly Life Insurance Premium: <input type="number" ng-model="life_insurance" ng-init="life_insurance=30000"/></p>
+			      <p>Your yearly Health Insurance Premium (Not your company group insurance): <input type="number" ng-model="health_insurance" ng-init="health_insurance=15000"/></p>
+			      <p>Your Emergency Fund (How much have you saved for emergency?): <input type="number" ng-model="emergency" ng-init="emergency=100000"/></p>
+		      </div>
+		      <div ng-switch="home_loan">
+			      <div ng-switch-when="have"><p>Your monthly Home Loan EMI: <input type="number" ng-model="data.home_emi" ng-init="data.home_emi=26000"/> </p></div>
+		      </div>
+		      <div ng-switch="hra">
+			      <div ng-switch-when="rented"><p>Your monthly Rent: <input type="number" ng-model="data.rent" ng-init="data.rent=27000"/></p></div>
+			      <div ng-switch-when="own"><p>Municipal Tax and Maintenance per Year: <input type="number" ng-model="data.house_tax" ng-init="data.house_tax=40000"/></p></div>
+		      </div>
+	      </div>
+	      <div id="summary">
+		      <p>Your annual net income is {{getAnnualNetIncome()}}</p>
+		      <p>You need {{getEmergencyFund()}} as emergency corpus. {{getEmergencyReadiness()}} </p>
+		      <p>You need to invest at-least 15% for pension (NPS or Pension Fund): {{getAnnualNetIncome() * 0.15}}</p>
+	      </div>
       </div>
     </div>	
   </body>
