@@ -46,7 +46,7 @@
 	}]);
 	</script>
 	<style>
-	#warning {
+	#summary {
             border-style: solid;
             border-color: coral;
 	    background-color: yellow;
@@ -57,9 +57,11 @@
     <h1>Your Financial Planner</h1>
     <div ng-controller="plancontrol">
       <p>I earn <input type="text" ng-model="monthly_salary" ng-init="monthly_salary='60000'"> per month. I do <select ng-model="home_loan" ng-init="home_loan='have'"> <option selected="selected" value="have">have</option> <option value="do not have">do not have</option></select> a home loan. Further, I live in <select ng-model="hra"> <option selected="selected" value="own" ng-init="hra='own'"> my own house</option> <option value="rented" ng-int="hra='rented'"> a rental house</option></select> </p>
+      <div id="summary">
 	  <h3>Wow! You earn {{annual_salary()}} per annum. That's {{salary_wish()}}!!</h3>
 	  <h3>And you {{home_loan}} home loan. That's {{home_loan_wish()}}!!</h3>
 	  <h3>Also you live in {{hra}} house. That's sounds {{hra_wish()}}!!</h3>
+      </div>
     </div>	
   </body>
 </html>
