@@ -24,11 +24,30 @@
             border-style: solid;
 	    border-color: grey;
 	}
+	.cb {
+            list-style: none;
+            padding: 10px;
+            display:inline-block;
+            background-color: #000;
+            color: #FFF;
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+        .cb:hover{
+            background-color: #4a4a4a;
+            color: #FFF;
+        }
         </style>
   </head>
   <body>
     <p>Financial Planner</p>
-    <div id="main" ng-controller="plancontrol">
+    <div id="main" ng-controller="plancontrol" ng-init="tab = 1">
+        <div class="cb" ng-click="tab = 1">Savings Plan</div>
+        <div class="cb" ng-click="tab = 2">Tax Plan</div>
+        <div class="cb" ng-click="tab = 3">Retirement Plan</div>
+        <div class="cb" ng-click="tab = 4">Debt Repayment Plan</div>
+        <div class="cb" ng-click="tab = 5">Investment Plan</div>
+    <div id="page1" ng-show="tab == 1">
 	    <p>I earn <input type="number" ng-model="monthly_salary" ng-init="monthly_salary=60000"/> per month. I do <select ng-model="home_loan" ng-init="home_loan='have'"> <option selected="selected" value="have">have</option> <option value="do not have">do not have</option></select> a home loan. Further, I live in <select ng-model="hra"> <option selected="selected" value="own" ng-init="hra='own'"> my own house</option> <option value="rented" ng-int="hra='rented'"> a rental house</option></select> </p>
       <div id="summary">
 	  <p>Wow! You earn {{annual_salary()}} per annum. That's {{salary_wish()}}!!</p>
@@ -58,6 +77,19 @@
 		      <p>You need to invest at-least 15% for pension (NPS or Pension Fund): {{getAnnualNetIncome() * 0.15}}</p>
 	      </div>
       </div>
+    </div>	
+        <div ng-show="tab == 2">
+            <p>Tax</p>
+        </div>
+        <div ng-show="tab == 3">
+            <p>Retire</p>
+        </div>
+        <div ng-show="tab == 4">
+            <p>Debt Repayment Plan</p>
+        </div>
+        <div ng-show="tab == 5">
+            <p>Invest</p>
+        </div>
     </div>	
   </body>
 </html>
