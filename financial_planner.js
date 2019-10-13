@@ -73,3 +73,53 @@
 		  }
 	  };
 	}]);
+
+	myapp.controller('taxcontroller', [ "$scope", function($scope) {
+		$scope.user = {
+			age : function(newage){ return arguments.length ? newage : "27"; },
+			gross_salary : 900000,
+			basic_pay : 40000,
+			city : metro,
+			rent_paid : 28000,
+			gorss_hra : 336000,
+			conveyance : 1600,
+			other_allowance : 0,
+			prof_tax : 2500,
+			applicable_hra : 0,
+			salary_head : 0
+		};
+		$scope.master = {};
+		$scope.update = function(user) {
+                  $scope.master = angular.copy(user);
+                };
+
+		$scope.reset = function(form) {
+                if (form) {
+                  form.$setPristine();
+                  form.$setUntouched();
+                }
+                $scope.user = angular.copy($scope.master);
+                };
+		$scope.calculate_hra = function() {
+			var hra_list = [];
+			var hra = 9999999;
+			var ten_per_of_basic = $scope.user.basic_pay / 10;
+			hra_list[0] = ($scope.user.rent_paid - ten_per_of_basic) * 12;
+			hra_list[1] = ($scope.user.basic_pay / 2) * 12;
+			hra_list[2] = $scope.user.gross_hra;
+			for(i=0;i<hra_list.length;i++){
+				if(hra > hra_list[i]){
+					hra = hra_list[i];
+				}
+			}
+			$scope.user.applicable_hra = hra;
+			return hra;
+		};
+
+		$scope.calculate_sec10_salary = function(){
+			$scope.user.salary_head = $scope.user.gross_salary - $scope.user.applicable_hra - $scope.user.prof_tax - $scope.user.other_allowance - $scope.user.conveyance * 12;
+			return $scope.user.salary_head;
+		};
+            
+                $scope.reset();
+	}]);
