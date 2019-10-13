@@ -37,6 +37,18 @@
             background-color: #4a4a4a;
             color: #FFF;
         }
+	.warning{
+	    color: #ff3300;
+	}
+	.aggregate{
+            color: #001a00;
+	}
+	.calculated{
+            color: #0a1a00;
+	    border-left: 1px solid #ccc;
+	    border-right: 1px solid #ccc;
+	    text-align: right;
+	}
         </style>
   </head>
   <body>
@@ -79,7 +91,180 @@
       </div>
     </div>	
         <div ng-show="tab == 2">
-            <p>Tax</p>
+            <p>Complete Tax Calculator - India</p>
+	    <div ng-controller="taxcontroller">
+	    <form name="form" class="css-form" novalidate>
+	    <table>
+		    <tr>
+			    <td width="40%">Your Age:</td>
+			    <td width="20%"><input type="number" ng-model="user.age" ng-model-options="{ getterSetter: true }" name="tax_age" id="tax_age" min="1" max="150" required integer />
+                              <div ng-show="form.$submitted || form.tax_age.$touched">
+                                <div class="warning" ng-show="form.tax_age.$error.required">Tell us your age.</div>
+			        <div class="warning" ng-show="form.tax_age.$error.min || form.tax_age.$error.max">Age is invalid</div>
+                              </div>
+			    </td>
+			    <td width="20%"></td>
+			    <td width="20%"></td>
+		    </tr>
+		    <tr>
+			    <th width="40%" align="left">Description</th>
+			    <th width="20%" align="left">Monthly Input</th>
+			    <th width="20%" align="left">Calculated</th>
+			    <th width="20%" align="left">Yearly Input</th>
+		    </tr>
+		    <tr>
+			    <td width="40%">Gross Annual Income(including all allowances):</td>
+			    <td width="20%">
+			      <div class="aggregate" ng-show="form.gross_salary.$valid"> {{user.gross_salary / 12 | number:2}} </div>
+			    </td>
+			    <td width="20%" class="calculated">
+			      <div ng-show="form.gross_salary.$valid"> {{user.gross_salary | number:2}} </div>
+			    </td>
+			    <td width="20%">
+		              <input type="number" ng-model="user.gross_salary" name="gross_salary" id="gross_salary" required="" min="1" integer />
+                              <div ng-show="form.$submitted || form.gross_salary.$touched">
+                                <div class="warning" ng-show="form.gross_salary.$error.required">Gross Salary Required.</div>
+			        <div class="warning" ng-show="form.gross_salary.$error.min">Gross Salary is invalid</div>
+                              </div>
+			    </td>
+		    </tr>
+		    <tr>
+			    <td width="40%">House Rent Allowance (HRA):</td>
+			    <td width="20%">
+			    </td>
+			    <td width="20%" class="calculated">
+				    <div> <p> {{ calculate_hra() | number:2 }} </p></div>
+			    </td>
+			    <td width="20%">
+			    </td>
+		    </tr>
+		    <tr>
+			    <td width="40%">Are you staying in Metro-City:<br/>Delhi,Mumbai,Kolkata or Chennai</td>
+			    <td width="20%">
+                              <label><input type="radio" ng-model="user.city" name="metro" id="metro" value="metro" ng-required="!city" />Yes</label>
+                              <label><input type="radio" ng-model="user.city" name="non_metro" id="non_metro" value="non_metro" ng-required="!city" />No</label>
+                              <div ng-show="form.$submitted">
+                                <div class="warning" ng-show="!form.metro.$touched && !form.non_metro.$touched">Tell us your city of residence.</div>
+                              </div>
+			    </td>
+			    <td width="20%" class="calculated"></td>
+			    <td width="20%">
+			      <div class="aggregate" ng-show="form.metro.$touched || form.non_metro.$touched"> {{user.city}} </div>
+			    </td>
+		    </tr>
+		    <tr>
+			    <td width="40%">Basic Pay + Dearness Allowance(if any) per month:</td>
+			    <td width="20%">
+                              <input type="number" ng-model="user.basic_pay" name="basic_pay" id="basic_pay" value="" required="" min="1" max="{{user.gross_salary / 12}}" integer/>
+                              <div ng-show="form.$submitted || form.basic_pay.$touched">
+                                <div class="warning" ng-show="form.basic_pay.$error.required">Tell us your basic pay.</div>
+                                <div class="warning" ng-show="form.basic_pay.$error.min || form.basic_pay.$error.max">Basic pay is invalid.</div>
+                              </div>
+			    </td>
+			    <td width="20%" class="calculated"></td>
+			    <td width="20%">
+			      <div class="aggregate" ng-show="form.basic_pay.$touched"> {{user.basic_pay * 12}} </div>
+			    </td>
+		    </tr>
+		    <tr>
+			    <td width="40%">Actual Rent Paid Per Month:</td>
+			    <td width="20%">
+                              <input type="number" ng-model="user.rent_paid" name="rent_paid" id="rent_paid" value="" required="" min="1" max="{{user.gross_salary / 12}}" integer/>
+                              <div ng-show="form.$submitted || form.rent_paid.$touched">
+                                <div class="warning" ng-show="form.rent_paid.$error.required">How much rent you pay.</div>
+                                <div class="warning" ng-show="form.rent_paid.$error.min || form.rent_paid.$error.max">Rent amount is invalid.</div>
+                              </div>
+			    </td>
+			    <td width="20%" class="calculated"></td>
+			    <td width="20%">
+			      <div class="aggregate" ng-show="form.rent_paid.$touched"> {{user.rent_paid * 12}} </div>
+			    </td>
+		    </tr>
+		    <tr>
+			    <td width="40%">Gross HRA Received from Company:</td>
+			    <td width="20%">
+			      <div class="aggregate" ng-show="form.gross_hra.$valid"> {{user.gross_hra / 12 | number:2}} </div>
+			    </td>
+			    <td width="20%" class="calculated"></td>
+			    <td width="20%">
+		              <input type="number" ng-model="user.gross_hra" name="gross_hra" id="gross_hra" required="" min="1" integer />
+                              <div ng-show="form.$submitted || form.gross_hra.$touched">
+                                <div class="warning" ng-show="form.gross_hra.$error.required">Gross HRA Required.</div>
+			        <div class="warning" ng-show="form.gross_hra.$error.min">Gross HRA is invalid</div>
+                              </div>
+			    </td>
+		    </tr>
+		    <tr>
+			    <td width="40%">Conveyance Allowance (Max 1600 per month):</td>
+			    <td width="20%">
+                              <input type="number" ng-model="user.conveyance" name="conveyance" id="conveyance" value="" required="" min="1" max="1600" integer/>
+                              <div ng-show="form.$submitted || form.conveyance.$touched">
+                                <div class="warning" ng-show="form.conveyance.$error.required">How much conveyance you get.</div>
+                                <div class="warning" ng-show="form.conveyance.$error.min || form.conveyance.$error.max">Conveyance amount is invalid.</div>
+                              </div>
+			    </td>
+			    <td width="20%" class="calculated">
+				    <div> <p> {{ user.conveyance * 12 | number:2 }} </p></div>
+			    </td>
+			    <td width="20%">
+			      <div class="aggregate" ng-show="form.conveyance.$touched"> {{user.conveyance * 12}} </div>
+			    </td>
+		    </tr>
+		    <tr>
+			    <td width="40%">Any Other Allowance:</td>
+			    <td width="20%">
+			    </td>
+			    <td width="20%" class="calculated">
+				    <div> <p> {{ user.other_allowance | number:2 }} </p></div>
+			    </td>
+			    <td width="20%">
+		              <input type="number" ng-model="user.other_allowance" name="other_allowance" id="other_allowance" min="0" integer />
+                              <div ng-show="form.$submitted || form.other_allowance.$touched">
+			        <div class="warning" ng-show="form.other_allowance.$error.min">Gross HRA is invalid</div>
+                              </div>
+			    </td>
+		    </tr>
+		    <tr>
+			    <td width="40%">Professional Tax Paid:</td>
+			    <td width="20%">
+			    </td>
+			    <td width="20%" class="calculated">
+				    <div> <p> {{ user.prof_tax | number:2 }} </p></div>
+			    </td>
+			    </td>
+			    <td width="20%">
+		              <input type="number" ng-model="user.prof_tax" name="prof_tax" id="prof_tax" required="" min="1" max="2500" integer />
+                              <div ng-show="form.$submitted || form.prof_tax.$touched">
+                                <div class="warning" ng-show="form.prof_tax.$error.required">Professional Tax is Required.</div>
+			        <div class="warning" ng-show="form.prof_tax.$error.min || form.prof_tax.$error.max">Professional Tax is invalid</div>
+                              </div>
+			    </td>
+		    </tr>
+		    <tr>
+			    <td width="40%">Income under the head salaries:</td>
+			    <td width="20%">
+			    </td>
+			    <td width="20%" class="calculated">
+				    <div> <p>{{ calculate_sec10_salary() | number:2 }}</p> </div>
+			    </td>
+			    <td width="20%">
+			    </td>
+		    </tr>
+		    <tr>
+			    <td width="40%">
+			    </td>
+			    <td width="20%">
+			    </td>
+			    <td width="20%">
+  		              <input type="button" ng-click="reset(form)" value="Reset" />
+			    </td>
+			    <td width="20%">
+			      <input type="submit" ng-click="update(user)" value="Calculate" />
+			    </td>
+		    </tr>
+            </table>
+	    </form>
+	    <div>
         </div>
         <div ng-show="tab == 3">
             <p>Retire</p>
